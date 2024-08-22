@@ -126,7 +126,7 @@ namespace ChatLunaTranslator {
         Schema.object({
             model: Schema.dynamic('model').description('使用的模型'),
             prompt: Schema.string().role('textarea')
-                .description(`你是一位专业多语言翻译师，擅长中日英互译，也擅长其他语言的翻译，并且擅长对翻译结果进行二次修改和润色成通俗易懂的目标语言。我希望你能帮我将 {from} 语言的文本翻译成 {to}，而后根据直译结果重新意译和润色。将最后润色的结果输出如下 json 格式：{{"result": "content"}}
+                .default(`你是一位专业多语言翻译师，擅长中日英互译，也擅长其他语言的翻译，并且擅长对翻译结果进行二次修改和润色成通俗易懂的目标语言。我希望你能帮我将 {from} 语言的文本翻译成 {to}，而后根据直译结果重新意译和润色。将最后润色的结果输出如下 json 格式：{{"result": "content"}}
 
 规则：
 - 这些文本可能包含专业知识和网络术语，注意翻译时术语的准确性和本地化梗。
