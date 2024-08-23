@@ -4,7 +4,7 @@
 
 _由 chatluna 中的大语言模型驱动提供的翻译服务_
 
-## [![npm](https://img.shields.io/npm/v/koishi-plugin-chatluna-character)](https://www.npmjs.com/package/koishi-plugin-chatluna-character) [![npm](https://img.shields.io/npm/dm/koishi-plugin-chatluna-character)](https://www.npmjs.com/package/koishi-plugin-chatluna-character) ![node version](https://img.shields.io/badge/node-%3E=18-green) ![github top language](https://img.shields.io/github/languages/top/ChatLunaLab/chatluna-character?logo=github)
+## [![npm](https://img.shields.io/npm/v/koishi-plugin-chatluna-translator)](https://www.npmjs.com/package/koishi-plugin-chatluna-translator) [![npm](https://img.shields.io/npm/dm/koishi-plugin-chatluna-translator)](https://www.npmjs.com/package/koishi-plugin-chatluna-translator) ![node version](https://img.shields.io/badge/node-%3E=18-green) ![github top language](https://img.shields.io/github/languages/top/ChatLunaLab/chatluna-character?logo=github)
 
 </div>
 

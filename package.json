@@ -1,7 +1,7 @@
 {
   "name": "koishi-plugin-chatluna-translator",
   "description": "Translation services powered by the large language model in chatluna",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "type": "module",
   "main": "lib/index.cjs",
   "module": "lib/index.mjs",
