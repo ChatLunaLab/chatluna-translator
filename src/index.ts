@@ -16,24 +16,18 @@ class ChatLunaTranslator extends Translator<ChatLunaTranslator.Config> {
     constructor(ctx: Context, config: ChatLunaTranslator.Config) {
         super(ctx, config)
 
-        ctx.on('chatluna/model-added', async (service) => {
-            ctx.schema.set(
-                'model',
-                Schema.union(await this.getModelNames(service))
-            )
+        ctx.on('chatluna/model-added', (service) => {
+            ctx.schema.set('model', Schema.union(this.getModelNames(service)))
         })
 
-        ctx.on('chatluna/model-removed', async (service) => {
-            ctx.schema.set(
-                'model',
-                Schema.union(await this.getModelNames(service))
-            )
+        ctx.on('chatluna/model-removed', (service) => {
+            ctx.schema.set('model', Schema.union(this.getModelNames(service)))
         })
 
-        ctx.on('ready', async () => {
+        ctx.on('ready', () => {
             ctx.schema.set(
                 'model',
-                Schema.union(await this.getModelNames(ctx.chatluna.platform))
+                Schema.union(this.getModelNames(ctx.chatluna.platform))
             )
         })
     }
@@ -107,7 +101,7 @@ class ChatLunaTranslator extends Translator<ChatLunaTranslator.Config> {
         return result.content as string
     }
 
-    async getModelNames(service: PlatformService) {
+    getModelNames(service: PlatformService) {
         return service.getAllModels(ModelType.llm).map((m) => Schema.const(m))
     }
 }
