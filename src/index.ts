@@ -2,33 +2,26 @@
 /* eslint-disable max-len */
 import { Context, Schema } from 'koishi'
 
-import { PlatformService } from 'koishi-plugin-chatluna/llm-core/platform/service'
-import { ModelType } from 'koishi-plugin-chatluna/llm-core/platform/types'
 import { HumanMessagePromptTemplate } from '@langchain/core/prompts'
-import { parseRawModelName } from 'koishi-plugin-chatluna/llm-core/utils/count_tokens'
 import { ChatLunaChatModel } from 'koishi-plugin-chatluna/llm-core/platform/model'
 import Translator from '@koishijs/translator'
+import { ComputedRef } from 'koishi-plugin-chatluna'
+import { modelSchema } from 'koishi-plugin-chatluna/utils/schema'
+import { getMessageContent } from 'koishi-plugin-chatluna/utils/string'
 
 // after build, in lib/index.cjs, please add default to Translator
 // import_translator.default  -> import_translator.default.default
 // fuck js https://github.com/evanw/esbuild/issues/2623
 class ChatLunaTranslator extends Translator<ChatLunaTranslator.Config> {
+    private _model: ComputedRef<ChatLunaChatModel>
+
     constructor(ctx: Context, config: ChatLunaTranslator.Config) {
         super(ctx, config)
 
-        ctx.on('chatluna/model-added', (service) => {
-            ctx.schema.set('model', Schema.union(this.getModelNames(service)))
-        })
+        modelSchema(ctx)
 
-        ctx.on('chatluna/model-removed', (service) => {
-            ctx.schema.set('model', Schema.union(this.getModelNames(service)))
-        })
-
-        ctx.on('ready', () => {
-            ctx.schema.set(
-                'model',
-                Schema.union(this.getModelNames(ctx.chatluna.platform))
-            )
+        ctx.on('ready', async () => {
+            this._model = await this.getModel()
         })
     }
 
@@ -68,14 +61,20 @@ class ChatLunaTranslator extends Translator<ChatLunaTranslator.Config> {
     }
 
     async getModel() {
-        const [platform, modelName] = parseRawModelName(this.config.model)
-
-        await this.ctx.chatluna.awaitLoadPlatform(platform)
-
-        return (await this.ctx.chatluna.createChatModel(
-            platform,
-            modelName
-        )) as ChatLunaChatModel
+        if (this._model) {
+            return this._model
+        }
+        try {
+            const modelRef = await this.ctx.chatluna.createChatModel(
+                this.config.model
+            )
+            return (this._model = modelRef)
+        } catch (e) {
+            this.ctx.logger.error(e)
+            throw new Error(
+                '模型未初始化或者加载模型失败。请检查是否配置了正确的模型。'
+            )
+        }
     }
 
     async invoke(
@@ -90,7 +89,11 @@ class ChatLunaTranslator extends Translator<ChatLunaTranslator.Config> {
 
         const model = await this.getModel()
 
-        const result = await model.invoke([
+        if (!model) {
+            return '模型未初始化或者加载模型失败。请检查是否配置了正确的模型。'
+        }
+
+        const result = await model.value.invoke([
             ...(await prompt.formatMessages({
                 from,
                 to,
@@ -98,11 +101,7 @@ class ChatLunaTranslator extends Translator<ChatLunaTranslator.Config> {
             }))
         ])
 
-        return result.content as string
-    }
-
-    getModelNames(service: PlatformService) {
-        return service.getAllModels(ModelType.llm).map((m) => Schema.const(m))
+        return getMessageContent(result.content)
     }
 }
 
